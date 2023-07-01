@@ -3,13 +3,6 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-RUN apt-get update && apt-get install -y \
-    libfontconfig1 \
-    libfreetype6 \
-    libx11-6 \
-    libxext6 \
-    libxrender1
-
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["InvoiceGenerator.csproj", "./"]
@@ -23,5 +16,13 @@ RUN dotnet publish "InvoiceGenerator.csproj" -c Release -o /app/publish /p:UseAp
 
 FROM base AS final
 WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    libfontconfig1 \
+    libfreetype6 \
+    libx11-6 \
+    libxext6 \
+    libxrender1
+
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "InvoiceGenerator.dll"]
